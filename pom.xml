@@ -53,6 +53,11 @@
             <version>5.7.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.openjdk.nashorn</groupId>
+            <artifactId>nashorn-core</artifactId>
+            <version>15.3</version>
+        </dependency>
 
         <!-- JUnit 4 (para compatibilidad con pruebas que usen JUnit 4)
         <dependency>
