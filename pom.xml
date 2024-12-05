@@ -12,7 +12,7 @@
         <java.version>11</java.version>
         <maven.compiler.version>3.11.0</maven.compiler.version>
         <maven.surefire.version>2.22.2</maven.surefire.version>
-        <karate.version>0.9.6</karate.version>
+        <karate.version>1.2.0</karate.version>
     </properties>
 
     <dependencies>
@@ -22,12 +22,12 @@
             <version>${karate.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
+        <!--  <dependency>
             <groupId>com.intuit.karate</groupId>
             <artifactId>karate-apache</artifactId>
-            <version>${karate.version}</version>
+            <version>0.9.6</version>
             <scope>test</scope>
-        </dependency>
+        </dependency> -->
         <dependency>
             <groupId>com.intuit.karate</groupId>
             <artifactId>karate-core</artifactId>

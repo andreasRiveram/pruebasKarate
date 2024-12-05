@@ -6,7 +6,14 @@ function fn() {
   }
   var config = {
     env: env,
-    myVarName: 'someValue'
+    myVarName: 'someValue',
+        karateOptions: {
+          // Especificar los reportes JSON
+          report: {
+            json: 'target/karate-report.json',
+             html: 'target/karate-reports/karate-report.html'
+          }
+        }
   }
   if (env == 'dev') {
     // customize
