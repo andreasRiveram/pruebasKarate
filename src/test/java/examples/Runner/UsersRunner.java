@@ -9,9 +9,11 @@ import org.junit.jupiter.api.Test;*/
 
 //import com.intuit.karate.junit5.Karate;
 import com.intuit.karate.KarateOptions;
+import com.intuit.karate.Runner;
+import com.intuit.karate.core.Feature;
 import com.intuit.karate.junit5.Karate;
 import org.junit.jupiter.api.Test;
-import com.intuit.karate.Runner;
+
 import com.intuit.karate.Results;
 import org.apache.commons.io.FileUtils;
 import net.masterthought.cucumber.Configuration;
@@ -22,14 +24,37 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static com.intuit.karate.Runner.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-//@KarateOptions(features = {"classpath:examples/users/users.feature"})
+@KarateOptions(features = {"classpath:examples/users/users.feature"})
 
 class UsersRunner {
-    @Karate.Test
+ /*   @Karate.Test
     Karate testAll() {
-     /*   // Ejecutar las pruebas en paralelo
+        // Ejecutar las pruebas y generar los archivos JSON en el directorio especificado
+        Results results;  // Directorio donde se guardan los archivos JSON
+        results = Runner.runFeature("classpath:examples/users/users.feature")
+                .outputCucumberJson(true)  // Esto genera el archivo JSON
+                .reportDir("target/karate-reports");
+
+        // Mostrar la ruta de los resultados generados
+        System.out.println("Ruta de los resultados: " + results.getReportDir());
+
+        // Llamar a la función para generar el reporte a partir de los archivos JSON generados
+        generateReport(results.getReportDir());
+
+        // Verificar que no hubo fallos en las pruebas
+        if (results.getFailCount() > 0) {
+            System.out.println("Pruebas fallidas: " + results.getFailCount());
+        } else {
+            System.out.println("Todas las pruebas pasaron!");
+        }
+
+
+
+
+        // Ejecutar las pruebas en paralelo
         Results results = Runner.parallel(getClass(), 1, "target/surefire-reports");
 
         generateReport(results.getReportDir());
@@ -38,7 +63,7 @@ class UsersRunner {
         return Karate.run("classpath:examples/users/users.feature").outputCucumberJson(true)
                 .reportDir("target/surefire-reports");
 
-        // Llamar al método generateReport después de ejecutar las pruebas*/
+        // Llamar al método generateReport después de ejecutar las pruebas
         // Ejecutar las pruebas en paralelo y generar los reportes
         Results results = Runner.parallel(getClass(), 1, "target/surefire-reports");
 
@@ -54,19 +79,19 @@ class UsersRunner {
         // Retornar el resultado de Karate, habilitando la salida en JSON
         return Karate.run("classpath:examples/users/users.feature")
                 .outputCucumberJson(true)  // Genera el reporte JSON de Cucumber
-                .reportDir("target/karate-reports"); // Directorio de los reportes generados
+                .reportDir("target/karate-reports");// Directorio de los reportes generados
 
 
 
-    }
+    }*/
 
     @Test
     public void testParallel() {
-       /* System.out.println(getClass() );
+        System.out.println(getClass() );
         Results results = Runner.parallel(getClass(), 1, "target/surefire-reports");
        // Results results = Runner.path("target/surefire-reports").outputCucumberJson(true).parallel(1);
         System.out.println("Ruta de los resultados: " + results.getReportDir());
-        generateReport(results.getReportDir());*/
+        generateReport(results.getReportDir());
 
 
     }
