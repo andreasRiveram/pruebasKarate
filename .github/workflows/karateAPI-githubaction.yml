@@ -17,11 +17,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Run Karate tests
-        run: mvn test
-
       - name: Upload Karate Report
         uses: actions/upload-artifact@v3
         with:
           name: karate-report
           path: target/cucumber-html-reports/
+
+      - name: Run Karate tests
+        run: mvn test
