@@ -25,7 +25,7 @@ public class ExamplesTest {
         //Results results = Runner.path("classpath:users").parallel(2);
         Results results = Runner.path("classpath:examples/users").outputCucumberJson(true).parallel(2);
         System.out.println("Ruta de los resultados: " + results.getReportDir());
-       // generateReport(results.getReportDir());
+        generateReport(results.getReportDir());
     }
 
     public static void generateReport(String karateOutputPath) {
