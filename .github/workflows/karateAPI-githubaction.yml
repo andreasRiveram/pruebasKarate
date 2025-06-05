@@ -1,5 +1,10 @@
 name: Karate API Tests
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+  pull request:
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
   test:
