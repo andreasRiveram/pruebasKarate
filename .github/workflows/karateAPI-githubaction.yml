@@ -1,8 +1,9 @@
 name: Karate API Tests
+
 on:
   push:
   pull_request:
-  workflow_dispatch:
+  workflow_dispatch: # Permite ejecución manual desde GitHub
 
 jobs:
   test:
@@ -20,10 +21,29 @@ jobs:
       - name: Run Karate tests
         run: mvn test
 
+      - name: Check Karate JSON Report
+        run: ls -l target/karate-reports/ # Verifica que el reporte JSON se ha generado
+
+      - name: Read Karate JSON Report
+        run: |
+          cat target/karate-reports/examples.users.users.json | jq '.summary'
+
+      - name: Extract Karate Summary
+        id: karate_summary
+        run: |
+          echo "summary=$(jq -r '.summary' target/karate-reports/examples.users.users.json)" >> $GITHUB_ENV
+
+      - name: Use Karate Summary
+        run: echo "El resultado del reporte es ${{ env.summary }}"
+
       - name: Upload Karate Report
         uses: actions/upload-artifact@v4
         with:
           name: karate-report
           path: target/surefire-reports/
 
-
+      - name: Upload Karate JSON Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: karate-json-report
+          path: target/karate-reports/examples.users.users.json
