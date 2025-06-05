@@ -21,9 +21,11 @@ public class ExamplesTest {
     @Test
     public void testParallel() {
         System.out.println(getClass() );
-        Results results = Runner.parallel(getClass(), 1, "target/surefire-reports");
+       //Results results = Runner.parallel(getClass(), 1, "target/surefire-reports");
+        //Results results = Runner.path("classpath:users").parallel(2);
+        Results results = Runner.path("classpath:examples/users").outputCucumberJson(true).parallel(2);
         System.out.println("Ruta de los resultados: " + results.getReportDir());
-        generateReport(results.getReportDir());
+       // generateReport(results.getReportDir());
     }
 
     public static void generateReport(String karateOutputPath) {
