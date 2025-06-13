@@ -15,7 +15,7 @@ Feature: sample karate test script
     When method get
     Then status 200
 
-  Scenario: create a user and then get it by id
+  Scenario: create a user and then get it by ids
     * def user =
       """
       {
