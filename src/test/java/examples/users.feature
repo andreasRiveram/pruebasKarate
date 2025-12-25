@@ -4,6 +4,7 @@ Feature: sample karate test script
   Background:
     * url 'https://jsonplaceholder.typicode.com'
 
+  @tag1
   Scenario: get all users and then get the first user by id
     Given path '/users'
     When method get
@@ -15,6 +16,7 @@ Feature: sample karate test script
     When method get
     Then status 200
 
+  @tag2
   Scenario: create a user and then get it by ids
     * def user =
       """
@@ -43,4 +45,5 @@ Feature: sample karate test script
     # When method get
     # Then status 200
     # And match response contains user
+  #mvn clean verify -Dkarate.options="--tags @tag2" && open target/karate-reports/karate-summary.html
   

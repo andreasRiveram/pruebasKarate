@@ -1,0 +1,53 @@
+explicame porque aqui se tenia que poner el client_id con el guion abajo: And form field grant_type = 'refresh_token'
+
+And form field client_id = client_id
+
+And form field client_secret = client_secret
+
+And form field refresh_token = refresh_token
+
+RESPUESTA
+
+Esta es una excelente pregunta técnica. La razón no tiene que ver con Karate, sino con el estándar de comunicación que usa internet para la seguridad, llamado OAuth 2.0.
+
+Aquí tienes la explicación detallada de por qué esos guiones bajos son obligatorios:
+
+1. El Estándar OAuth 2.0 (RFC 6749)
+Acoustic, al igual que Google, Facebook o cualquier API moderna, sigue un "manual de reglas" internacional llamado RFC 6749. Este manual dicta que para pedir un token, los nombres de los parámetros deben ser exactamente:
+
+grant_type
+
+client_id
+
+client_secret
+
+refresh_token
+
+Si tú envías clientId (con "I" mayúscula y sin guion), el servidor de Acoustic no lo reconoce porque está programado para buscar la etiqueta exacta que dice el estándar. Es como si en un formulario físico te piden "Apellido" y tú escribes tu nombre en ese espacio; el sistema lo rechazará.
+
+2. La anatomía de la línea en Karate
+Para entenderlo mejor, descompongamos lo que sucede en esta línea: And form field client_id = client_id
+
+client_id (Izquierda): Es el nombre del campo que viaja por el cable hacia Acoustic. Debe ser con guion bajo porque así lo exige la API.
+
+client_id (Derecha): Es el nombre de la variable que tú creaste en tu karate-config.js (o la que pasaste en el objeto formFields). Podría haberse llamado miVariable, pero por orden solemos llamarlas igual.
+
+Dato curioso: Si en tu karate-config.js hubieras puesto config.usuario = clientId, en el feature tendrías que poner: And form field client_id = usuario.
+
+3. Case Sensitivity (Sensibilidad a Mayúsculas)
+En el mundo de las APIs y la programación:
+
+client_id (Snake Case)
+
+clientId (Camel Case)
+
+clientid (Lower Case)
+
+Son tres cosas totalmente distintas. La mayoría de los servidores de autenticación (como el de Acoustic) están configurados en lenguaje Java o C#, donde la diferencia entre una mayúscula y un guion bajo hace que la llave de seguridad sea inválida.
+
+Resumen visual de la petición
+Cuando ejecutas ese código, Karate construye detrás de escena un cuerpo de texto que se ve exactamente así:
+
+grant_type=refresh_token&client_id=f97a11...&client_secret=6b13...&refresh_token=rmjn...
+
+Si cambiaras los guiones bajos, ese texto cambiaría y el "portero" de la API de Acoustic te diría: "No entiendo qué es clientId, yo solo acepto client_id".
