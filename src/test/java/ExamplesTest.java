@@ -1,11 +1,7 @@
-package examples;
-
 import com.intuit.karate.KarateOptions;
 import com.intuit.karate.Results;
 import com.intuit.karate.Runner;
-import static org.junit.jupiter.api.Assertions.*;
 
-import com.intuit.karate.junit5.Karate;
 import net.masterthought.cucumber.Configuration;
 import net.masterthought.cucumber.ReportBuilder;
 import org.apache.commons.io.FileUtils;
@@ -23,7 +19,7 @@ public class ExamplesTest {
         System.out.println(getClass() );
        //Results results = Runner.parallel(getClass(), 1, "target/surefire-reports");
         //Results results = Runner.path("classpath:users").parallel(2);
-        Results results = Runner.path("classpath:examples/users").outputCucumberJson(true).parallel(2);
+        Results results = Runner.path("classpath:envioSMS").outputCucumberJson(true).parallel(2);
         System.out.println("Ruta de los resultados: " + results.getReportDir());
         generateReport(results.getReportDir());
     }
