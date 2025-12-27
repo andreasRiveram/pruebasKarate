@@ -1,0 +1,16 @@
+{
+  "statusCode202": {
+    "meta": {
+      "attributes": "#object",
+      "generalErrors": "#[]",
+      "fieldErrors": "#object",
+      "links": "#[]",
+      "nextPageUrl": "#null"
+    },
+    "data": {
+      "location": "#regex ^https://.*",
+      "id": "#string"
+    }
+  }
+}
+
