@@ -14,6 +14,8 @@ function fn() {
   // 3. Definimos el objeto config inicial (ya con el env correcto)
   var config = {
       env: env,
+      smsBaseUrl: 'https://api-campaign-us-2.goacoustic.com',
+      placeholderUrl: 'https://jsonplaceholder.typicode.com',
       baseUrl: '',
       accessToken: '',
       mi_variableMVN_clientId: mi_variableMVN_clientId,
@@ -23,25 +25,26 @@ function fn() {
 
   // 4. Lógica por ambiente
   if (env == 'dev') {
-    var baseUrlToken = 'https://api-campaign-us-2.goacoustic.com/oauth/token';
+     smsBaseUrl = 'https://api-campaign-us-2.goacoustic.com/oauth/token';
 
-    var formFields = {
-      baseUrl: baseUrlToken,
-      grant_type: 'refresh_token',
-      client_id_valor_feature: mi_variableMVN_clientId,
-      client_secret_valor_feature: mi_variableMVN_clientSecret,
-      refresh_token_valor_feature: mi_variableMVN_refreshToken
-    };
+//    var formFields = {
+//      baseUrl: smsBaseUrl,
+//      grant_type: 'refresh_token',
+//      client_id_valor_feature: mi_variableMVN_clientId,
+//      client_secret_valor_feature: mi_variableMVN_clientSecret,
+//      refresh_token_valor_feature: mi_variableMVN_refreshToken
+//    };
+//
+//    // 5. Llamada al feature y asignación al objeto config
+//    // NIVEL EXPERTO: Solo llama al token si las credenciales están presentes
+//      // Esto evita el error 400 en features que no usan el token de Acoustic
+//    if (mi_variableMVN_clientId && mi_variableMVN_clientSecret && mi_variableMVN_refreshToken) {
+//    var result = karate.callSingle('classpath:Auto/envioSMS/features/TokenSMS.feature', formFields);
+//
+//    config.accessToken = result.response.access_token;
+    config.baseUrl = smsBaseUrl;
+    }
 
-    // 5. Llamada al feature y asignación al objeto config
-    var result = karate.callSingle('classpath:envioSMS/TokenSMS.feature', formFields);
-
-    config.accessToken = result.response.access_token;
-    config.baseUrl = baseUrlToken;
-
-  } else if (env == 'e2e') {
-    // config.baseUrl = 'otra_url';
-  }
 
   return config;
 }

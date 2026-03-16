@@ -1,3 +1,5 @@
+package Auto;
+
 import com.intuit.karate.KarateOptions;
 import com.intuit.karate.Results;
 import com.intuit.karate.Runner;
@@ -12,14 +14,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@KarateOptions(features = {"classpath:examples/users/users.feature"})
 public class ExamplesTest {
     @Test
     public void testParallel() {
         System.out.println(getClass() );
        //Results results = Runner.parallel(getClass(), 1, "target/surefire-reports");
         //Results results = Runner.path("classpath:users").parallel(2);
-        Results results = Runner.path("classpath:envioSMS").outputCucumberJson(true).parallel(2);
+        Results results = Runner.path("classpath:Auto").outputCucumberJson(true).parallel(2);
         System.out.println("Ruta de los resultados: " + results.getReportDir());
         generateReport(results.getReportDir());
     }

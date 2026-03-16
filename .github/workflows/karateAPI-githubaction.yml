@@ -29,12 +29,12 @@ jobs:
 #
 #      - name: Read Karate JSON Report
 #        run: |
-#          cat target/karate-reports/examples.users.users.json | jq '.summary'
+#          cat target/karate-reports/Auto.examples.users.users.json | jq '.summary'
 #
 #      - name: Extract Karate Summary
 #        id: karate_summary
 #        run: |
-#          echo "summary=$(jq -r '.summary' target/karate-reports/examples.users.users.json)" >> $GITHUB_ENV
+#          echo "summary=$(jq -r '.summary' target/karate-reports/Auto.examples.users.users.json)" >> $GITHUB_ENV
 #
 #      - name: Use Karate Summary
 #        run: echo "El resultado del reporte es ${{ env.summary }}"
@@ -49,4 +49,4 @@ jobs:
 #        uses: actions/upload-artifact@v4
 #        with:
 #          name: karate-json-report
-#          path: target/karate-reports/examples.users.users.json
+#          path: target/karate-reports/Auto.examples.users.users.json

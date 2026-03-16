@@ -2,7 +2,17 @@ Feature: sample karate test script
   for help, see: https://github.com/karatelabs/karate/wiki/IDE-Support
 
   Background:
-    * url 'https://jsonplaceholder.typicode.com'
+    * configure afterScenario =
+    """
+    function() {
+      karate.log('Scenario completed:', karate.scenario.name);
+      if (karate.info.errorMessage) {
+        karate.log('FAILED:', karate.info.errorMessage);
+      }
+    }
+    """
+    # Usamos la variable del config en lugar de hardcodear la URL
+    * url placeholderUrl
 
   @tag1
   Scenario: get all users and then get the first user by id

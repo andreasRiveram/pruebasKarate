@@ -5,9 +5,9 @@ Feature: Capturar Token
     Given url baseUrl
     And header Content-Type = 'application/x-www-form-urlencoded'
     And form field grant_type = 'refresh_token'
-    And form field client_id = client_id_valor_feature
-    And form field client_secret = client_secret_valor_feature
-    And form field refresh_token = refresh_token_valor_feature
+    And form field client_id = mi_variableMVN_clientId
+    And form field client_secret = mi_variableMVN_clientSecret
+    And form field refresh_token = mi_variableMVN_refreshToken
     When method post
     Then status 200
 
