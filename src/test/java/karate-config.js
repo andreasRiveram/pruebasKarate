@@ -1,4 +1,6 @@
 function fn() {
+  karate.configure('ssl', true); // O 'ssl', { trustAll: true } según tu versión
+
   // 1. Primero determinamos el entorno (env)
   var env = karate.env;
   if (!env) {

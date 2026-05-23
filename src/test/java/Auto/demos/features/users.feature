@@ -2,10 +2,11 @@ Feature: sample karate test script
   for help, see: https://github.com/karatelabs/karate/wiki/IDE-Support
 
   Background:
+    * def responseUsersById = read ('classpath:Auto/responses/usersResponse.json')
     * configure afterScenario =
     """
     function() {
-      karate.log('Scenario completed:', karate.scenario.name);
+      karate.log('Scenario completo Ok:', karate.scenario.name);
       if (karate.info.errorMessage) {
         karate.log('FAILED:', karate.info.errorMessage);
       }
@@ -15,16 +16,30 @@ Feature: sample karate test script
     * url placeholderUrl
 
   @tag1
-  Scenario: get all users and then get the first user by id
+  Scenario Outline: get all users and then get the first user by id - GRM
     Given path '/users'
     When method get
     Then status 200
 
-    * def first = response[0]
+   # * def first = response[valorID]
+   # * print '/', first
 
-    Given path 'users', first.id
+    Given path 'users', valorID
     When method get
     Then status 200
+   # And match response == responseUsersById
+    # Ejecutamos el match y guardamos el resultado en una variable
+    * def resultadoMatch = karate.match(response, responseUsersById.responseOK)
+
+  # Imprimimos el resultado en el reporte
+    * print '¿Es la respuesta correcta?:', resultadoMatch.pass
+
+  # Si quieres que aparezca un mensaje personalizado
+    * def mensaje = resultadoMatch.pass ? 'VALIDACIÓN EXITOSA' : 'ERROR EN ESTRUCTURA'
+    * print 'Resultado final:', mensaje
+   Examples:
+     | read('classpath:Auto/data/dataUsers.csv') |
+
 
   @tag2
   Scenario: create a user and then get it by ids

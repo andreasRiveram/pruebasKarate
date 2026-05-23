@@ -1,10 +1,10 @@
 Feature: Envio de SMS de IBK desde Karate
 
   Background:
-    * def auth = callonce read('classpath:Auto/envioSMS/features/TokenSMS.feature')
+    * def auth = callonce read('classpath:Auto/envioSMS/TokenSMS.feature')
     * def accessToken = auth.response.access_token
-    * def reponsesJson = read ('classpath:Auto/envioSMS/responses/smsResponse.json')
-    * def requestSms = read ('classpath:Auto/envioSMS/request/sendSMS.json')
+    * def reponsesJson = read ('classpath:Auto/responses/smsResponse.json')
+    * def requestSms = read ('classpath:Auto/request/sendSMS.json')
 
   @tagEnvioSMS @componenteSMS
   Scenario: Envio de SMS a cualquier Numero
