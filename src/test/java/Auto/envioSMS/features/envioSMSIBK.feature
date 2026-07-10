@@ -1,14 +1,14 @@
 Feature: Envio de SMS de IBK desde Karate
 
   Background:
-    * def auth = callonce read('classpath:Auto/envioSMS/TokenSMS.feature')
+    * def auth = callonce read('classpath:Auto/envioSMS/features/TokenSMS.feature')
     * def accessToken = auth.response.access_token
     * def reponsesJson = read ('classpath:Auto/responses/smsResponse.json')
     * def requestSms = read ('classpath:Auto/request/sendSMS.json')
 
   @tagEnvioSMS @componenteSMS
   Scenario: Envio de SMS a cualquier Numero
-    Given url 'https://api-campaign-us-2.goacoustic.com/rest/channels/sms/externalconsentsends'
+    Given url urlSMSEnvio
     And header Authorization = 'Bearer ' + accessToken
     And request requestSms.smsOk
     When method post

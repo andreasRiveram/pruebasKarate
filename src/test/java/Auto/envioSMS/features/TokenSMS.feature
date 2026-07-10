@@ -2,7 +2,7 @@ Feature: Capturar Token
 
   @tokenSMS
   Scenario: Obtener Token SMS
-    Given url baseUrl
+    Given url baseUrlSMS
     And header Content-Type = 'application/x-www-form-urlencoded'
     And form field grant_type = 'refresh_token'
     And form field client_id = mi_variableMVN_clientId
