@@ -61,7 +61,7 @@ Feature: sample karate test script
     Given url 'https://jsonplaceholder.typicode.com/users'
     And request user
     When method post
-    Then status 201
+    Then status 209
 
     * def id = response.id
     * print 'created id is: ', id

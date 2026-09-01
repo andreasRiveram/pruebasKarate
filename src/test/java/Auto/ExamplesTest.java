@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class ExamplesTest {
     @Test
     public void testParallel() {
@@ -23,6 +25,8 @@ public class ExamplesTest {
         Results results = Runner.path("classpath:Auto").outputCucumberJson(true).parallel(2);
         System.out.println("Ruta de los resultados: " + results.getReportDir());
         generateReport(results.getReportDir());
+        // LÍNEA CLAVE: Si hay al menos 1 fallo, la prueba JUnit fallará y detendrá Maven con un exit code de error
+        assertEquals(0, results.getFailCount(), results.getErrorMessages());
     }
 
     public static void generateReport(String karateOutputPath) {
