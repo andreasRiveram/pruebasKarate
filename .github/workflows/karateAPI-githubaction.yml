@@ -25,22 +25,68 @@ jobs:
           distribution: 'temurin'
 
       - name: Ejecutar Pruebas Karate
+        id: run_karate
+        continue-on-error: true
         run: |
           TAG_TO_RUN="${{ inputs.karate_tag }}"
           if [ -z "$TAG_TO_RUN" ]; then
             TAG_TO_RUN="@componenteSMS"
           fi
 
-          # Ejecutamos Maven guardando su código de salida (exit code)
           mvn clean verify \
             -Dkarate.env=dev \
             -Dkarate.options="--tags $TAG_TO_RUN" \
             -Dclient-Id="${{ secrets.CLIENT_ID }}" \
             -Dclient-Secret="${{ secrets.CLIENT_SECRET }}" \
-            -Drefresh-Token="${{ secrets.REFRESH_TOKEN }}" || EXIT_CODE=$?
+            -Drefresh-Token="${{ secrets.REFRESH_TOKEN }}"
 
-          # Si el código de salida fue distinto de 0, imprimimos el mensaje
-          if [ ${EXIT_CODE:-0} -ne 0 ]; then
+      - name: Generar GitHub Summary
+        if: always()
+        run: |
+          TAG_EXECUTED="${{ inputs.karate_tag || '@componenteSMS' }}"
+          ACTOR="${{ github.actor }}"
+          SUMMARY_FILE="target/karate-reports/karate-summary-json.txt"
+          
+          if [ -f "$SUMMARY_FILE" ]; then
+            SCENARIOS=$(jq '.scenariosPassed + .scenariosFailed' $SUMMARY_FILE)
+            PASSED=$(jq '.scenariosPassed' $SUMMARY_FILE)
+            FAILED=$(jq '.scenariosFailed' $SUMMARY_FILE)
+            DURATION_MS=$(jq '.durationMillis' $SUMMARY_FILE)
+            DURATION=$(awk "BEGIN {printf \"%.2f sec\", $DURATION_MS/1000}")
+          else
+            SCENARIOS="N/A"
+            PASSED="N/A"
+            FAILED="N/A"
+            DURATION="N/A"
+          fi
+
+          if [ "${{ steps.run_karate.outcome }}" == "success" ]; then
+            STATUS="🟢 PASSED"
+            FAILURE_REASON="Ninguno (Todos los casos pasaron con éxito)"
+          else
+            STATUS="🔴 FAILED"
+            FAILURE_REASON="Al menos un escenario de prueba salió fallido"
+          fi
+
+          cat <<EOF >> $GITHUB_STEP_SUMMARY
+          # 📊 RESULTADO DE LA EJECUCIÓN
+
+          | Métrica | Detalle |
+          | :--- | :--- |
+          | **Tag Ejecutado** | \`$TAG_EXECUTED\` |
+          | **Ejecutado por** | @$ACTOR |
+          | **Estado** | **$STATUS** |
+          | **Escenarios Totales** | $SCENARIOS |
+          | **Passed** | ✅ $PASSED |
+          | **Failed** | ❌ $FAILED |
+          | **Test Duration** | ⏱️ $DURATION |
+          | **Failure Reason** | $FAILURE_REASON |
+          EOF
+
+      - name: Validar Resultado Final
+        if: always()
+        run: |
+          if [ "${{ steps.run_karate.outcome }}" != "success" ]; then
             echo "::error::❌ Al menos un Caso de Prueba salió con ERROR"
             exit 1
           fi
