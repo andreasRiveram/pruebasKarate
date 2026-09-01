@@ -99,7 +99,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Apunta a la carpeta donde ExamplesTest.java genera los reportes Cucumber
-          path: 'target/cucumber-html-reports/'
+          path: 'target/karate-reports/'
 
       - name: Publicar en GitHub Pages
         if: always()
