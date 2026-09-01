@@ -31,9 +31,16 @@ jobs:
             TAG_TO_RUN="@componenteSMS"
           fi
 
+          # Ejecutamos Maven guardando su código de salida (exit code)
           mvn clean verify \
             -Dkarate.env=dev \
             -Dkarate.options="--tags $TAG_TO_RUN" \
             -Dclient-Id="${{ secrets.CLIENT_ID }}" \
             -Dclient-Secret="${{ secrets.CLIENT_SECRET }}" \
-            -Drefresh-Token="${{ secrets.REFRESH_TOKEN }}"
+            -Drefresh-Token="${{ secrets.REFRESH_TOKEN }}" || EXIT_CODE=$?
+
+          # Si el código de salida fue distinto de 0, imprimimos el mensaje
+          if [ ${EXIT_CODE:-0} -ne 0 ]; then
+            echo "::error::❌ Al menos un Caso de Prueba salió con ERROR"
+            exit 1
+          fi
