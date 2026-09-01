@@ -8,7 +8,7 @@ on:
       karate_tag:
         description: 'Tag que deseas ejecutar individualmente'
         required: true
-        default: '@componenteSMS' # Tu primer tag a probar
+        default: '@componenteSMS'
 
 jobs:
   karate-tests:
@@ -25,10 +25,15 @@ jobs:
           distribution: 'temurin'
 
       - name: Ejecutar Pruebas Karate
-        env:
-          SMS_API_KEY: ${{ secrets.SMS_API_KEY }}
-          SMS_SECRET_TOKEN: ${{ secrets.SMS_SECRET_TOKEN }}
-          # Toma el input si lo ejecutas manualmente; si es por push, usa @componenteSMS
-          EXEC_TAG: ${{ inputs.karate_tag || '@componenteSMS' }}
         run: |
-          mvn test -Dkarate.options="--tags '${{ env.EXEC_TAG }}'"
+          TAG_TO_RUN="${{ inputs.karate_tag }}"
+          if [ -z "$TAG_TO_RUN" ]; then
+            TAG_TO_RUN="@componenteSMS"
+          fi
+
+          mvn clean verify \
+            -Dkarate.env=dev \
+            -Dkarate.options="--tags $TAG_TO_RUN" \
+            -Dclient-Id="${{ secrets.CLIENT_ID }}" \
+            -Dclient-Secret="${{ secrets.CLIENT_SECRET }}" \
+            -Drefresh-Token="${{ secrets.REFRESH_TOKEN }}"
