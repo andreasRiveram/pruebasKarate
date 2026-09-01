@@ -20,6 +20,11 @@ jobs:
       pages: write
       id-token: write
 
+    # Permite solo un despliegue a Pages a la vez
+    concurrency:
+      group: "pages"
+      cancel-in-progress: false
+
     steps:
       - name: Checkout del código
         uses: actions/checkout@v4
@@ -46,12 +51,30 @@ jobs:
             -Dclient-Secret="${{ secrets.CLIENT_SECRET }}" \
             -Drefresh-Token="${{ secrets.REFRESH_TOKEN }}"
 
+      # --- DESPLIEGUE A GITHUB PAGES ---
+      - name: Configurar GitHub Pages
+        if: always()
+        uses: actions/configure-pages@v5
+
+      - name: Cargar Reporte de Karate para Pages
+        if: always()
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'target/karate-reports/'
+
+      - name: Publicar en GitHub Pages
+        if: always()
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      # --- GENERACIÓN DE SUMMARY CON LINK A LA URL ---
       - name: Generar GitHub Summary
         if: always()
         run: |
           TAG_EXECUTED="${{ inputs.karate_tag || '@componenteSMS' }}"
           ACTOR="${{ github.actor }}"
           SUMMARY_FILE="target/karate-reports/karate-summary-json.txt"
+          REPORT_URL="${{ steps.deployment.outputs.page_url }}"
           
           if [ -f "$SUMMARY_FILE" ]; then
             SCENARIOS=$(jq '.scenariosPassed + .scenariosFailed' $SUMMARY_FILE)
@@ -86,25 +109,9 @@ jobs:
           | **Passed** | ✅ $PASSED |
           | **Failed** | ❌ $FAILED |
           | **Test Duration** | ⏱️ $DURATION |
+          | **Reporte en Vivo** | 🔗 [Abrir Karate Summary HTML]($REPORT_URL) |
           | **Failure Reason** | $FAILURE_REASON |
           EOF
-
-      # --- DESPLIEGUE A GITHUB PAGES ---
-      - name: Configurar GitHub Pages
-        if: always()
-        uses: actions/configure-pages@v5
-
-      - name: Cargar Reporte Cucumber HTML como Artefacto de Pages
-        if: always()
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Apunta a la carpeta donde ExamplesTest.java genera los reportes Cucumber
-          path: 'target/karate-reports/'
-
-      - name: Publicar en GitHub Pages
-        if: always()
-        id: deployment
-        uses: actions/deploy-pages@v4
 
       - name: Validar Resultado Final
         if: always()
