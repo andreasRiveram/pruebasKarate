@@ -8,6 +8,12 @@ on:
     branches:
       - Envio-SMS-karate
   workflow_dispatch:
+    inputs:
+      karate_tags:
+        description: 'Tag(s) de Karate a ejecutar (ej: @componenteSMS, @smoke)'
+        required: false
+        default: '@componenteSMS'
+        type: string
 
 jobs:
   test:
@@ -26,7 +32,7 @@ jobs:
         run: |
           mvn clean verify \
             -Dkarate.env=dev \
-            -Dkarate.options="--tags=@componenteSMS" \
+            -Dkarate.options="--tags=${{ github.event.inputs.karate_tags || '@componenteSMS' }}" \
             -Dclient-Id="${{ secrets.CLIENT_ID }}" \
             -Dclient-Secret="${{ secrets.CLIENT_SECRET }}" \
             -Drefresh-Token="${{ secrets.REFRESH_TOKEN }}"
