@@ -1,38 +1,34 @@
-name: Karate API Tests
+name: Karate Tests Pipeline
 
 on:
   push:
-    branches:
-      - Envio-SMS-karate
-  pull_request:
-    branches:
-      - Envio-SMS-karate
+    branches: [ "Envio-SMS-karate" ]
   workflow_dispatch:
     inputs:
-      karate_tags:
-        description: 'Tag(s) de Karate a ejecutar (ej: @componenteSMS, @smoke)'
-        required: false
-        default: '@componenteSMS'
-        type: string
+      karate_tag:
+        description: 'Tag que deseas ejecutar individualmente'
+        required: true
+        default: '@componenteSMS' # Tu primer tag a probar
 
 jobs:
-  test:
+  karate-tests:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
+      - name: Checkout del código
         uses: actions/checkout@v4
 
-      - name: Set up JDK
+      - name: Configurar Java JDK
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
           java-version: '17'
+          distribution: 'temurin'
 
-      - name: Run Karate tests
+      - name: Ejecutar Pruebas Karate
+        env:
+          SMS_API_KEY: ${{ secrets.SMS_API_KEY }}
+          SMS_SECRET_TOKEN: ${{ secrets.SMS_SECRET_TOKEN }}
+          # Toma el input si lo ejecutas manualmente; si es por push, usa @componenteSMS
+          EXEC_TAG: ${{ inputs.karate_tag || '@componenteSMS' }}
         run: |
-          mvn clean verify \
-            -Dkarate.env=dev \
-            -Dkarate.options="--tags=${{ github.event.inputs.karate_tags || '@componenteSMS' }}" \
-            -Dclient-Id="${{ secrets.CLIENT_ID }}" \
-            -Dclient-Secret="${{ secrets.CLIENT_SECRET }}" \
-            -Drefresh-Token="${{ secrets.REFRESH_TOKEN }}"
+          mvn test -Dkarate.options="--tags '${{ env.EXEC_TAG }}'"
