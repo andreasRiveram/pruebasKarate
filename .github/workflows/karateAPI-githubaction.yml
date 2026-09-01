@@ -2,7 +2,11 @@ name: Karate API Tests
 
 on:
   push:
+    branches:
+      - Envio-SMS-karate
   pull_request:
+    branches:
+      - Envio-SMS-karate
   workflow_dispatch:
 
 jobs:
@@ -10,43 +14,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
       - name: Run Karate tests
-        run: mvn test
-
-#      - name: Install jq
-#        run: sudo apt-get update && sudo apt-get install -y jq
-#
-#      - name: Check Karate JSON Report
-#        run: ls -l target/karate-reports/ # Verifica que el reporte JSON se ha generado
-#
-#      - name: Read Karate JSON Report
-#        run: |
-#          cat target/karate-reports/Auto.examples.users.users.json | jq '.summary'
-#
-#      - name: Extract Karate Summary
-#        id: karate_summary
-#        run: |
-#          echo "summary=$(jq -r '.summary' target/karate-reports/Auto.examples.users.users.json)" >> $GITHUB_ENV
-#
-#      - name: Use Karate Summary
-#        run: echo "El resultado del reporte es ${{ env.summary }}"
-#
-#      - name: Upload Karate Report
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: karate-report
-#          path: target/surefire-reports/
-#
-#      - name: Upload Karate JSON Report
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: karate-json-report
-#          path: target/karate-reports/Auto.examples.users.users.json
+        run: |
+          mvn clean verify \
+            -Dkarate.env=dev \
+            -Dkarate.options="--tags=@componenteSMS" \
+            -Dclient-Id="${{ secrets.CLIENT_ID }}" \
+            -Dclient-Secret="${{ secrets.CLIENT_SECRET }}" \
+            -Drefresh-Token="${{ secrets.REFRESH_TOKEN }}"
