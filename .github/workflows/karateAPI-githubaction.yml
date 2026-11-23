@@ -11,6 +11,7 @@ on:
         required: true
         default: '@componenteSMS'
         options:
+           - '@componenteSMS'
            - '@componenteDinamico'
            - '@componenteSMS2'
            - '@tag1'
