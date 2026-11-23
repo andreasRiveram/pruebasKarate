@@ -2,13 +2,19 @@ name: Karate Tests Pipeline
 
 on:
   push:
-    branches: [ "Envio-SMS-karate" ]
+    branches: [ "main" ]
   workflow_dispatch:
     inputs:
       karate_tag:
-        description: 'Tag que deseas ejecutar individualmente'
+        description: 'Selecciona el tag que deseas ejecutar'
+        type: choice
         required: true
         default: '@componenteSMS'
+        options:
+           - '@componenteDinamico'
+           - '@componenteSMS2'
+           - '@tag1'
+           - '@tag2'
 
 jobs:
   karate-tests:
