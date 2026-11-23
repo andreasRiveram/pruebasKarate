@@ -1,0 +1,28 @@
+{
+  "responseOK": {
+    "id": "#number",
+    "name": "#string",
+    "username": "#string",
+    "email": "#regex ^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$",
+    "address": {
+      "street": "#string",
+      "suite": "#string",
+      "city": "#string",
+      "zipcode": "#regex ^[0-9]{5}(-[0-9]{4})?$",
+      "geo": {
+        "lat": "#? !isNaN(_)",
+        "lng": "#? !isNaN(_)"
+      }
+    },
+    "phone": "#string",
+    "website": "#regex ^(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w .-]*/?$",
+    "company": {
+      "name": "#string",
+      "catchPhrase": "#string",
+      "bs": "#string"
+    }
+
+
+  }
+
+}

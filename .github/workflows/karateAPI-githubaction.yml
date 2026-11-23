@@ -1,52 +1,122 @@
-name: Karate API Tests
+name: Karate Tests Pipeline
 
 on:
   push:
-  pull_request:
+    branches: [ "Envio-SMS-karate" ]
   workflow_dispatch:
+    inputs:
+      karate_tag:
+        description: 'Tag que deseas ejecutar individualmente'
+        required: true
+        default: '@componenteSMS'
 
 jobs:
-  test:
+  karate-tests:
     runs-on: ubuntu-latest
+
+    # Permisos necesarios para escribir y desplegar en GitHub Pages
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    # Permite solo un despliegue a Pages a la vez
+    concurrency:
+      group: "pages"
+      cancel-in-progress: false
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Checkout del código
+        uses: actions/checkout@v4
 
-      - name: Set up JDK
-        uses: actions/setup-java@v2
+      - name: Configurar Java JDK
+        uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
           java-version: '17'
+          distribution: 'temurin'
 
-      - name: Run Karate tests
-        run: mvn test
+      - name: Ejecutar Pruebas Karate
+        id: run_karate
+        continue-on-error: true
+        run: |
+          TAG_TO_RUN="${{ inputs.karate_tag }}"
+          if [ -z "$TAG_TO_RUN" ]; then
+            TAG_TO_RUN="@componenteSMS"
+          fi
 
-#      - name: Install jq
-#        run: sudo apt-get update && sudo apt-get install -y jq
-#
-#      - name: Check Karate JSON Report
-#        run: ls -l target/karate-reports/ # Verifica que el reporte JSON se ha generado
-#
-#      - name: Read Karate JSON Report
-#        run: |
-#          cat target/karate-reports/examples.users.users.json | jq '.summary'
-#
-#      - name: Extract Karate Summary
-#        id: karate_summary
-#        run: |
-#          echo "summary=$(jq -r '.summary' target/karate-reports/examples.users.users.json)" >> $GITHUB_ENV
-#
-#      - name: Use Karate Summary
-#        run: echo "El resultado del reporte es ${{ env.summary }}"
-#
-#      - name: Upload Karate Report
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: karate-report
-#          path: target/surefire-reports/
-#
-#      - name: Upload Karate JSON Report
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: karate-json-report
-#          path: target/karate-reports/examples.users.users.json
+          mvn clean verify \
+            -Dkarate.env=dev \
+            -Dkarate.options="--tags $TAG_TO_RUN" \
+            -Dclient-Id="${{ secrets.CLIENT_ID }}" \
+            -Dclient-Secret="${{ secrets.CLIENT_SECRET }}" \
+            -Drefresh-Token="${{ secrets.REFRESH_TOKEN }}"
+
+      # --- DESPLIEGUE A GITHUB PAGES ---
+      - name: Configurar GitHub Pages
+        if: always()
+        uses: actions/configure-pages@v5
+
+      - name: Cargar Reporte de Karate para Pages
+        if: always()
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'target/karate-reports/'
+
+      - name: Publicar en GitHub Pages
+        if: always()
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      # --- GENERACIÓN DE SUMMARY CON LINK A LA URL ---
+      - name: Generar GitHub Summary
+        if: always()
+        run: |
+          TAG_EXECUTED="${{ inputs.karate_tag || '@componenteSMS' }}"
+          ACTOR="${{ github.actor }}"
+          SUMMARY_FILE="target/karate-reports/karate-summary-json.txt"
+          REPORT_URL="${{ steps.deployment.outputs.page_url }}"
+          
+          if [ -f "$SUMMARY_FILE" ]; then
+            SCENARIOS=$(jq '.scenariosPassed + .scenariosFailed' $SUMMARY_FILE)
+            PASSED=$(jq '.scenariosPassed' $SUMMARY_FILE)
+            FAILED=$(jq '.scenariosFailed' $SUMMARY_FILE)
+            DURATION_MS=$(jq '.durationMillis' $SUMMARY_FILE)
+            DURATION=$(awk "BEGIN {printf \"%.2f sec\", $DURATION_MS/1000}")
+          else
+            SCENARIOS="N/A"
+            PASSED="N/A"
+            FAILED="N/A"
+            DURATION="N/A"
+          fi
+
+          if [ "${{ steps.run_karate.outcome }}" == "success" ]; then
+            STATUS="🟢 PASSED"
+            FAILURE_REASON="Ninguno (Todos los casos pasaron con éxito)"
+          else
+            STATUS="🔴 FAILED"
+            FAILURE_REASON="Al menos un escenario de prueba salió fallido"
+          fi
+
+          cat <<EOF >> $GITHUB_STEP_SUMMARY
+          # 📊 RESULTADO DE LA EJECUCIÓN
+
+          | Métrica | Detalle |
+          | :--- | :--- |
+          | **Tag Ejecutado** | \`$TAG_EXECUTED\` |
+          | **Ejecutado por** | @$ACTOR |
+          | **Estado** | **$STATUS** |
+          | **Escenarios Totales** | $SCENARIOS |
+          | **Passed** | ✅ $PASSED |
+          | **Failed** | ❌ $FAILED |
+          | **Test Duration** | ⏱️ $DURATION |
+          | **Reporte en Vivo** | 🔗 [Abrir Karate Summary HTML]($REPORT_URL) |
+          | **Failure Reason** | $FAILURE_REASON |
+          EOF
+
+      - name: Validar Resultado Final
+        if: always()
+        run: |
+          if [ "${{ steps.run_karate.outcome }}" != "success" ]; then
+            echo "::error::❌ Al menos un Caso de Prueba salió con ERROR"
+            exit 1
+          fi

@@ -1,4 +1,6 @@
 function fn() {
+  karate.configure('ssl', true); // O 'ssl', { trustAll: true } según tu versión
+
   // 1. Primero determinamos el entorno (env)
   var env = karate.env;
   if (!env) {
@@ -14,7 +16,11 @@ function fn() {
   // 3. Definimos el objeto config inicial (ya con el env correcto)
   var config = {
       env: env,
-      baseUrl: '',
+      urlTokenSMS: 'https://api-campaign-us-2.goacoustic.com/oauth/token',
+      urlSMSEnvio: 'https://api-campaign-us-2.goacoustic.com/rest/channels/sms/externalconsentsends',
+      urlRestFull: 'https://restful-booker.herokuapp.com',
+      placeholderUrl: 'https://jsonplaceholder.typicode.com',
+      baseUrlSMS: '',
       accessToken: '',
       mi_variableMVN_clientId: mi_variableMVN_clientId,
       mi_variableMVN_clientSecret: mi_variableMVN_clientSecret,
@@ -23,25 +29,10 @@ function fn() {
 
   // 4. Lógica por ambiente
   if (env == 'dev') {
-    var baseUrlToken = 'https://api-campaign-us-2.goacoustic.com/oauth/token';
+        config.baseUrlSMS = config.urlTokenSMS
 
-    var formFields = {
-      baseUrl: baseUrlToken,
-      grant_type: 'refresh_token',
-      client_id_valor_feature: mi_variableMVN_clientId,
-      client_secret_valor_feature: mi_variableMVN_clientSecret,
-      refresh_token_valor_feature: mi_variableMVN_refreshToken
-    };
+    }
 
-    // 5. Llamada al feature y asignación al objeto config
-    var result = karate.callSingle('classpath:envioSMS/TokenSMS.feature', formFields);
-
-    config.accessToken = result.response.access_token;
-    config.baseUrl = baseUrlToken;
-
-  } else if (env == 'e2e') {
-    // config.baseUrl = 'otra_url';
-  }
 
   return config;
 }
